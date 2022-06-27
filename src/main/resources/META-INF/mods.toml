@@ -1,0 +1,74 @@
+modLoader = "javafml" #mandatory
+loaderVersion = "[41,)"
+license = "MIT"
+
+[[mods]]
+modId = "fe2"
+version = "${file.jarVersion}"
+displayName = "ForgeEnergy 2.0"
+#updateJSONURL="http://myurl.me/" #optional
+#displayURL="http://example.com/" #optional
+#logoFile="ForgeEnergyTwo.png" #optional
+#credits="Thanks for this example mod goes to Java" #optional
+authors = "UnderMybrella" #optional
+description = '''
+A new implementation of ForgeEnergy that focuses on mod inter-compatability while encouraging mods to use unique systems.
+'''
+[[dependencies.fe2]]
+modId = "forge"
+mandatory = true
+versionRange = "[41,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.fe2]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19,1.20)"
+ordering = "NONE"
+side = "BOTH"
+
+[[mods]]
+modId = "mechanisation"
+version = "${file.jarVersion}"
+displayName = "Mechanisation"
+authors = "UnderMybrella"
+description = '''
+A sample mod that implements a pure 'industrial' energy system.
+'''
+[[dependencies.mechanisation]]
+modId = "fe2"
+mandatory = true
+versionRange = ","
+ordering = "NONE"
+side = "BOTH"
+
+[[mods]]
+modId = "radiant"
+version = "${file.jarVersion}"
+displayName = "Radiant"
+authors = "UnderMybrella"
+description = '''
+A sample mod that implements an all-rounder system, compatible with anything and everything.
+'''
+[[dependencies.mechanisation]]
+modId = "fe2"
+mandatory = true
+versionRange = ","
+ordering = "NONE"
+side = "BOTH"
+
+[[mods]]
+modId = "rude_mountain"
+version = "${file.jarVersion}"
+displayName = "Rude Mountain"
+authors = "UnderMybrella"
+description = '''
+A sample mod that implements a magical energy system.
+'''
+[[dependencies.mechanisation]]
+modId = "fe2"
+mandatory = true
+versionRange = ","
+ordering = "NONE"
+side = "BOTH"

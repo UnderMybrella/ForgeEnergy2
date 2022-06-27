@@ -2,7 +2,7 @@
   "parent": "minecraft:block/orientable_with_bottom",
   "textures": {
     "bottom": "mechanisation:block/generator_bottom",
-    "front": "mechanisation:block/generator_front",
+    "front": "mechanisation:block/generator_front_on",
     "side": "mechanisation:block/generator_side",
     "top": "mechanisation:block/generator_top"
   }

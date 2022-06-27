@@ -55,7 +55,7 @@ public class FE2Storage implements IFE2Storage, INBTSerializable<Tag> {
             return energyReceived;
         }
 
-        float ratio = ((float) type.getUnitsForCoal()) / ((float) this.type.getUnitsForCoal());
+        float ratio = ((float) type.getEnergyValue()) / ((float) this.type.getEnergyValue());
         int energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, (int) Math.floor(((float) maxReceive) / ratio)));
 
         if (!simulate)
@@ -76,7 +76,7 @@ public class FE2Storage implements IFE2Storage, INBTSerializable<Tag> {
             return energyExtracted;
         }
 
-        float ratio = ((float) type.getUnitsForCoal()) / ((float) this.type.getUnitsForCoal());
+        float ratio = ((float) type.getEnergyValue()) / ((float) this.type.getEnergyValue());
         int energyExtracted = Math.min(energy, Math.min(this.maxExtract, (int) Math.floor(((float) maxReceive) / ratio)));
         if (!simulate)
             energy -= this.type.convertFrom(type, type.convertTo(this.type, energyExtracted));

@@ -1,0 +1,7 @@
+{
+  "block.mechanisation.generator": "Mechanised Generator",
+  "block.mechanisation.furnace": "Mechanised Furnace",
+  "block.mechanisation.energy_hopper": "Mechanised Operand Hopper",
+  "energy_type.mechanisation.mechanised_operands": "Mechanised Operands",
+  "energy_type.units.mechanisation.mechanised_operands": "MeO"
+}

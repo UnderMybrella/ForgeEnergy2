@@ -2,6 +2,7 @@ package dev.brella.fe2.impl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -77,5 +78,20 @@ public abstract class SimpleContainerBlockEntity extends BaseContainerBlockEntit
     @Override
     public void clearContent() {
         this.items.clear();
+    }
+
+    @Override
+    protected void saveAdditional(@NotNull CompoundTag compound) {
+        super.saveAdditional(compound);
+
+        ContainerHelper.saveAllItems(compound, this.items);
+    }
+
+    @Override
+    public void load(@NotNull CompoundTag compound) {
+        super.load(compound);
+
+        this.items.clear();
+        ContainerHelper.loadAllItems(compound, this.items);
     }
 }

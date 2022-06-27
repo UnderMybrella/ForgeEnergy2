@@ -12,7 +12,10 @@ public class EnergyType {
     private String descriptionId;
     private String unitId;
 
-    private final int unitsForCoal;
+    private final int energyValue;
+
+    private final boolean canPush;
+    private final boolean canPull;
 
     private final BiFunction<EnergyType, Integer, Integer> convertTo;
 
@@ -21,9 +24,11 @@ public class EnergyType {
     public EnergyType(Properties properties) {
         this.descriptionId = properties.descriptionId;
         this.unitId = properties.unitsId;
-        this.unitsForCoal = properties.unitsForCoal;
+        this.energyValue = properties.energyValue;
         this.convertTo = properties.convertTo;
         this.convertFrom = properties.convertFrom;
+        this.canPush = properties.canPush;
+        this.canPull = properties.canPull;
     }
 
     /**
@@ -39,8 +44,16 @@ public class EnergyType {
         return Component.translatable(this.getUnitId());
     }
 
-    public int getUnitsForCoal() {
-        return this.unitsForCoal;
+    public int getEnergyValue() {
+        return this.energyValue;
+    }
+
+    public boolean canPush() {
+        return this.canPush;
+    }
+
+    public boolean canPull() {
+        return this.canPull;
     }
 
     public BiFunction<EnergyType, Integer, Integer> getConvertFrom() {
@@ -93,7 +106,9 @@ public class EnergyType {
 
         private String unitsId;
 
-        private int unitsForCoal;
+        private int energyValue;
+        private boolean canPush = true;
+        private boolean canPull = true;
 
         private BiFunction<EnergyType, Integer, Integer> convertTo;
 
@@ -127,8 +142,18 @@ public class EnergyType {
             return this;
         }
 
-        public Properties unitsForCoal(int unitsForCoal) {
-            this.unitsForCoal = unitsForCoal;
+        public Properties energyValue(int energyValue) {
+            this.energyValue = energyValue;
+            return this;
+        }
+
+        public Properties canPush(boolean value) {
+            this.canPush = value;
+            return this;
+        }
+
+        public Properties canPull(boolean value) {
+            this.canPull = value;
             return this;
         }
 

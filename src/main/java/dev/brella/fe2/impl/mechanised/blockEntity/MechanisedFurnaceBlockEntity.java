@@ -30,7 +30,7 @@ public class MechanisedFurnaceBlockEntity extends BlockEntity {
 
         this.storage = new TaggedFE2Storage(Mechanisation.MECHANISED_OPERANDS.get(), EnergyTags.INDUSTRIAL, 1_000_000, 25_000);
         this.energyCapability = LazyOptional.of(() -> storage);
-        this.burnTickCost = (int) Math.round(((double) storage.getEnergyType().getUnitsForCoal()) / 1600.0 / 8.0);
+        this.burnTickCost = (int) Math.round(((double) storage.getEnergyType().getEnergyValue()) / 1600.0 / 8.0);
     }
 
     public int getBurnTime() {

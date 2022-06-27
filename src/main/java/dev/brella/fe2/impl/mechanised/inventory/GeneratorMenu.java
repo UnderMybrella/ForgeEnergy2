@@ -1,5 +1,7 @@
 package dev.brella.fe2.impl.mechanised.inventory;
 
+import dev.brella.fe2.impl.ForgeFurnaceFuelSlot;
+import dev.brella.fe2.impl.TaggedSlot;
 import dev.brella.fe2.impl.mechanised.Mechanisation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.Container;
@@ -8,7 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraft.world.item.crafting.RecipeType;
 import org.jetbrains.annotations.NotNull;
 
 public class GeneratorMenu extends AbstractContainerMenu {
@@ -25,7 +27,7 @@ public class GeneratorMenu extends AbstractContainerMenu {
         this.container = container;
         this.data = data;
 
-        this.addSlot(new GeneratorSlot(container, 0, 56 + 24, 53 - 14));
+        this.addSlot(new ForgeFurnaceFuelSlot(container, 0, 56 + 24, 53 - 14));
 
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 9; ++j) {
@@ -47,7 +49,7 @@ public class GeneratorMenu extends AbstractContainerMenu {
         if (slot.hasItem()) {
             ItemStack slotStack = slot.getItem();
 
-            if (slotStack.is(ItemTags.COALS)) {
+            if (net.minecraftforge.common.ForgeHooks.getBurnTime(slotStack, RecipeType.SMELTING) > 0) {
                 if (!this.moveItemStackTo(slotStack, 0, 1, false)){
                     return ItemStack.EMPTY;
                 }

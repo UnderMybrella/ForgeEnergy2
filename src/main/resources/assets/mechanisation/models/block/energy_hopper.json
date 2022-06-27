@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:block/hopper",
+
+  "textures": {
+    "particle": "mechanisation:block/energy_hopper_outside",
+    "top": "mechanisation:block/energy_hopper_top",
+    "side": "mechanisation:block/energy_hopper_outside",
+    "inside": "mechanisation:block/energy_hopper_inside"
+  }
+}

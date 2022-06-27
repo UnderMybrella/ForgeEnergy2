@@ -6,19 +6,17 @@ import dev.brella.fe2.IFE2Storage;
 import dev.brella.fe2.impl.SimpleContainerBlockEntity;
 import dev.brella.fe2.impl.TaggedFE2Storage;
 import dev.brella.fe2.impl.mechanised.Mechanisation;
+import dev.brella.fe2.impl.mechanised.block.MechanisedGeneratorBlock;
 import dev.brella.fe2.impl.mechanised.inventory.GeneratorMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -32,6 +30,7 @@ public class MechanisedGeneratorBlockEntity extends SimpleContainerBlockEntity {
     private final TaggedFE2Storage storage;
     private final LazyOptional<IFE2Storage> energyCapability;
     private final double perBurnTick;
+    private int maxBurnTime = 0;
     private int burnTime = 0;
     private double buffer = 0;
 
@@ -39,7 +38,7 @@ public class MechanisedGeneratorBlockEntity extends SimpleContainerBlockEntity {
         public int get(int index) {
             return switch (index) {
                 case 0 -> burnTime;
-                case 1 -> COAL_BURN_TIME;
+                case 1 -> maxBurnTime;
                 case 2 -> storage.getEnergyStored();
                 case 3 -> storage.getMaxEnergyStored();
                 default -> 0;
@@ -52,6 +51,8 @@ public class MechanisedGeneratorBlockEntity extends SimpleContainerBlockEntity {
                     burnTime = value;
                     break;
                 case 1:
+                    maxBurnTime = value;
+                    break;
                 case 2:
                 case 3:
                     break;
@@ -68,9 +69,9 @@ public class MechanisedGeneratorBlockEntity extends SimpleContainerBlockEntity {
         super(Mechanisation.GENERATOR_BLOCK_ENTITY.get(), pos, state, 1);
 
         this.storage = new TaggedFE2Storage(Mechanisation.MECHANISED_OPERANDS.get(), EnergyTags.INDUSTRIAL, 1_000_000, 25_000);
-        ;
+
         this.energyCapability = LazyOptional.of(() -> storage);
-        this.perBurnTick = ((double) storage.getEnergyType().getUnitsForCoal()) / COAL_BURN_TIME;
+        this.perBurnTick = ((double) storage.getEnergyType().getEnergyValue()) / COAL_BURN_TIME;
     }
 
     @Override
@@ -91,9 +92,8 @@ public class MechanisedGeneratorBlockEntity extends SimpleContainerBlockEntity {
     protected void saveAdditional(@NotNull CompoundTag compound) {
         super.saveAdditional(compound);
 
-        ContainerHelper.saveAllItems(compound, this.items);
-
         compound.put("storage", storage.serializeNBT());
+        compound.putInt("max_burn_time", maxBurnTime);
         compound.putInt("burn_time", burnTime);
         compound.putDouble("buffer", buffer);
     }
@@ -102,34 +102,48 @@ public class MechanisedGeneratorBlockEntity extends SimpleContainerBlockEntity {
     public void load(@NotNull CompoundTag compound) {
         super.load(compound);
 
-        this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(compound, this.items);
-
         storage.deserializeNBT(compound.get("storage"));
+        maxBurnTime = compound.getInt("max_burn_time");
         burnTime = compound.getInt("burn_time");
         buffer = compound.getDouble("buffer");
     }
 
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, MechanisedGeneratorBlockEntity entity) {
-        // Generate 1 coal's worth of energy
-
         boolean burning = entity.burnTime > 0;
+        boolean wasBurning = burning;
+        boolean changed = false;
+
         if (burning) {
             entity.burnTime--;
-            entity.buffer += entity.perBurnTick;
-        } else if (entity.storage.getEnergyStored() < entity.storage.getMaxEnergyStored()) {
+        } else if (entity.storage.getEnergyStored() < entity.storage.getMaxEnergyStored() && entity.buffer < entity.storage.getEnergyType().getEnergyValue()) {
             ItemStack stack = entity.getItem(0);
-            if (!stack.isEmpty() && stack.is(ItemTags.COALS)) {
-                stack.shrink(1);
-                entity.burnTime = COAL_BURN_TIME;
+            if (!stack.isEmpty()) {
+                int stackBurnTime = net.minecraftforge.common.ForgeHooks.getBurnTime(stack, RecipeType.SMELTING);
+                if (stackBurnTime > 0) {
+                    stack.shrink(1);
+                    entity.maxBurnTime = stackBurnTime;
+                    entity.burnTime = stackBurnTime;
 
-                burning = true;
+                    burning = true;
+                    changed = true;
+                }
             }
         }
 
         if (burning) {
             entity.buffer += entity.perBurnTick;
+        }
+
+        if (entity.burnTime > 0 != wasBurning) {
+            changed = true;
+
+            state = state.setValue(MechanisedGeneratorBlock.LIT, entity.burnTime > 0);
+            level.setBlock(pos, state, 3);
+        }
+
+        if (changed) {
+            setChanged(level, pos, state);
         }
 
         // Transfer from buffer
